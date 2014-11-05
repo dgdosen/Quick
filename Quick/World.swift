@@ -4,29 +4,40 @@ public typealias SharedExampleContext = () -> (NSDictionary)
 public typealias SharedExampleClosure = (SharedExampleContext) -> ()
 
 public class World: NSObject {
-    typealias BeforeSuiteClosure = () -> ()
-    typealias AfterSuiteClosure = BeforeSuiteClosure
-
     var _specs: Dictionary<String, ExampleGroup> = [:]
-
-    var _beforeSuites = [BeforeSuiteClosure]()
-    var _beforeSuitesNotRunYet = true
-
-    var _afterSuites = [AfterSuiteClosure]()
-    var _afterSuitesNotRunYet = true
-
     var _sharedExamples: [String: SharedExampleClosure] = [:]
+
+    let _configuration = Configuration()
+    var _isConfigurationFinalized = false
+
+    internal var exampleHooks: ExampleHooks {return _configuration.exampleHooks }
+    internal var suiteHooks: SuiteHooks { return _configuration.suiteHooks }
+
+    /**
+        Exposes the World's Configuration object within the scope of the closure
+        so that it may be configured. This method must not be called outside of
+        an overridden +[QuickConfiguration configure:] method.
+
+        :param: closure  A closure that takes a Configuration object that can
+                         be mutated to change Quick's behavior.
+    */
+    public func configure(closure: QuickConfigurer) {
+        assert(!_isConfigurationFinalized,
+               "Quick cannot be configured outside of a +[QuickConfiguration configure:] method. You should not call -[World configure:] directly. Instead, subclass QuickConfiguration and override the +[QuickConfiguration configure:] method.")
+        closure(configuration: _configuration)
+    }
+
+    /**
+        Finalizes the World's configuration.
+        Any subsequent calls to World.configure() will raise.
+    */
+    public func finalizeConfiguration() {
+        _isConfigurationFinalized = true
+    }
 
     public var currentExampleGroup: ExampleGroup?
 
     public var isRunningAdditionalSuites = false
-
-    struct _Shared {
-        static let instance = World()
-    }
-    public class func sharedWorld() -> World {
-        return _Shared.instance
-    }
 
     public func rootExampleGroupForSpecClass(cls: AnyClass) -> ExampleGroup {
         let name = NSStringFromClass(cls)
@@ -38,30 +49,6 @@ public class World: NSObject {
             _specs[name] = group
             return group
         }
-    }
-
-    func runBeforeSpec() {
-        assert(_beforeSuitesNotRunYet, "runBeforeSuite was called twice")
-        for beforeSuite in _beforeSuites {
-            beforeSuite()
-        }
-        _beforeSuitesNotRunYet = false
-    }
-
-    func runAfterSpec() {
-        assert(_afterSuitesNotRunYet, "runAfterSuite was called twice")
-        for afterSuite in _afterSuites {
-            afterSuite()
-        }
-        _afterSuitesNotRunYet = false
-    }
-
-    func appendBeforeSuite(closure: BeforeSuiteClosure) {
-        _beforeSuites.append(closure)
-    }
-
-    func appendAfterSuite(closure: AfterSuiteClosure) {
-        _afterSuites.append(closure)
     }
 
     var exampleCount: Int {

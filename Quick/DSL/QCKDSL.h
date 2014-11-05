@@ -1,22 +1,44 @@
 #import <Foundation/Foundation.h>
 
-#define QuickSharedExampleGroupsBegin(name) \
-    @interface name : QuickSharedExampleGroups; @end \
+/**
+ Provides a hook for Quick to be configured before any examples are run.
+ Within this scope, override the +[QuickConfiguration configure:] method
+ to set properties on a configuration object to customize Quick behavior.
+ For details, see the documentation for Configuraiton.swift.
+
+ @param name The name of the configuration class. Like any Objective-C
+             class name, this must be unique to the current runtime
+             environment.
+ */
+#define QuickConfigurationBegin(name) \
+    @interface name : QuickConfiguration; @end \
     @implementation name \
-    + (void)sharedExampleGroups { \
 
 
-#define QuickSharedExampleGroupsEnd \
-    } \
+/**
+ Marks the end of a Quick configuration.
+ Make sure you put this after `QuickConfigurationBegin`.
+ */
+#define QuickConfigurationEnd \
     @end \
 
 
+/**
+ Defines a new QuickSpec. Define examples and example groups within the space
+ between this and `QuickSpecEnd`.
+
+ @param name The name of the spec class. Like any Objective-C class name, this
+             must be unique to the current runtime environment.
+ */
 #define QuickSpecBegin(name) \
     @interface name : QuickSpec; @end \
     @implementation name \
     - (void)spec { \
 
 
+/**
+ Marks the end of a QuickSpec. Make sure you put this after `QuickSpecBegin`.
+ */
 #define QuickSpecEnd \
     } \
     @end \
