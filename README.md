@@ -912,15 +912,16 @@ can be done by including a Gemfile that looks like this:
 source 'https://rubygems.org'
 
 gem 'cocoapods', :git => 'https://github.com/CocoaPods/CocoaPods.git', :branch => 'swift'
-gem 'cocoapods-core', :git => 'https://github.com/CocoaPods/Core.git', :branch => 'swift'
-gem 'xcodeproj',  :git => "https://github.com/CocoaPods/Xcodeproj.git", :branch => 'ext_build_settings'
+gem 'cocoapods-core', :git => 'https://github.com/CocoaPods/Core.git'
+gem 'xcodeproj',  :git => 'https://github.com/CocoaPods/Xcodeproj.git'
+gem 'claide', :git => 'https://github.com/CocoaPods/CLAide.git'
 ```
 
 Then run `bundle install` to start using Swift CocoaPods for just this project.
 Then in your Podfile, add the following to your test target.
 
 ```
-  pod 'Quick', :git => "https://github.com/Quick/Quick", :head
+  pod 'Quick', :git => 'https://github.com/Quick/Quick', :tag => '0.2.0'
 ```
 
 Finally, run `bundle exec pod install`. The `bundle exec` ensures you're using
