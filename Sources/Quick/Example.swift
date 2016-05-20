@@ -67,20 +67,24 @@ final public class Example: NSObject {
         world.currentExampleMetadata = exampleMetadata
 
         world.exampleHooks.executeBefores(exampleMetadata)
+        group!.phase = .BeforesExecuting
         for before in group!.befores {
             before(exampleMetadata: exampleMetadata)
         }
+        group!.phase = .BeforesFinished
 
         closure()
 
+        group!.phase = .AftersExecuting
         for after in group!.afters {
             after(exampleMetadata: exampleMetadata)
         }
+        group!.phase = .AftersFinished
         world.exampleHooks.executeAfters(exampleMetadata)
 
-        ++numberOfExamplesRun
+        numberOfExamplesRun += 1
 
-        if !world.isRunningAdditionalSuites && numberOfExamplesRun >= world.exampleCount {
+        if !world.isRunningAdditionalSuites && numberOfExamplesRun >= world.includedExampleCount {
             world.suiteHooks.executeAfters()
         }
     }
